@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: cinewave-backend
+    runtime: java
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    env:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
