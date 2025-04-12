@@ -1,18 +1,22 @@
 # Use exact Java version from your pom.xml
-FROM eclipse-temurin:21-jdk-jammy
+FROM eclipse-temurin:17-jdk-jammy as builder
 
 WORKDIR /app
-
-# Copy build files first (better caching)
+COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-COPY .mvn/ .mvn/
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw package -DskipTests
 
-# Build the app (matches your pom.xml)
-RUN ./mvnw clean package
+# Create final lightweight image
+FROM eclipse-temurin:17-jre-jammy
 
-# Copy only the built JAR
-COPY target/mansi-*.jar app.jar
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 
-# Run with production profile
-CMD ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
+# Run as non-root user for security
+RUN useradd -m myuser && chown -R myuser:myuser /app
+USER myuser
 
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
