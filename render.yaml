@@ -2,7 +2,7 @@ services:
   - type: web
     name: cinewave-backend
     runtime: docker
-    dockerfilePath: /Dockerfile  # Explicitly point to your Dockerfile
+    dockerfilePath: ./Dockerfile  # Explicitly point to your Dockerfile
     env:
       - key: SPRING_PROFILES_ACTIVE
         value: production
