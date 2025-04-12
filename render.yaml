@@ -2,12 +2,12 @@ services:
   - type: web
     name: cinewave-backend
     runtime: docker
-    dockerfilePath: ./Dockerfile  # Explicitly point to your Dockerfile
+    dockerfilePath: /Dockerfile  # Explicitly point to your Dockerfile
     env:
       - key: SPRING_PROFILES_ACTIVE
         value: production
       - key: SPRING_DATA_MONGODB_URI
-        value: your_mongodb_uri_here  # Required for MongoDB
+        value: mongodb+srv://mansi0:mansi123@cluster0.vl8kt.mongodb.net/reactproject?retryWrites=true&w=majority&appName=Cluster0  # Required for MongoDB
       - key: JWT_SECRET
-        value: your_jwt_secret_here   # Required for JWT
+        value: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ2YW5zaEBnbWFpbC5jb20ifQ.JgTaNg1RVORSxW6GfRmjJ8Iv2iow7giB5ltRVHoO8Jy6NyRoBf4VyaptkVfMG63-  # Required for JWT
     healthCheckPath: /api/health      # Add a health check endpoint
