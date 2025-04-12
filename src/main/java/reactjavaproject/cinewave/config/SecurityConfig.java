@@ -21,30 +21,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight
-                .requestMatchers("/api/**").permitAll() // Allow all /api routes
-                .anyRequest().authenticated() // Secure other endpoints
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                    "/api/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             );
         return http.build();
     }
 
     @Bean
-CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of("http://localhost:3000")); // Your React app
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    config.setAllowedHeaders(List.of("*")); // Allow all headers
-    config.setAllowCredentials(true); // Required for cookies/auth headers
-    config.setExposedHeaders(List.of("Authorization")); // Expose JWT header
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",          // Local development
+            "https://your-vercel-app.vercel.app",  // Production frontend
+            "https://www.yourcustomdomain.com"     // If using custom domain
+        ));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setMaxAge(3600L); // Cache preflight response for 1 hour
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config); // Apply to all paths
-    return source;
-}
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
