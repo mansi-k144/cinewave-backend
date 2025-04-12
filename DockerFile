@@ -1,18 +1,17 @@
-# Use OpenJDK 21 to match your pom.xml
+# Use exact Java version from your pom.xml
 FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
 
-# Copy only the necessary files for build caching
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+# Copy build files first (better caching)
+COPY mvnw pom.xml ./
+COPY .mvn/ .mvn/
 
-# Build the application (matches your pom.xml config)
-RUN chmod +x mvnw && \
-    ./mvnw clean package && \
-    mv target/mansi-*.jar target/app.jar
+# Build the app (matches your pom.xml)
+RUN ./mvnw clean package
+
+# Copy only the built JAR
+COPY target/mansi-*.jar app.jar
 
 # Run with production profile
-CMD ["java", "-jar", "target/app.jar", "--spring.profiles.active=production"]
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
