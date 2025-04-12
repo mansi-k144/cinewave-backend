@@ -1,17 +1,36 @@
-# Use exact Java version from your pom.xml
-FROM eclipse-temurin:21-jdk-jammy
+# # Use exact Java version from your pom.xml
+# FROM eclipse-temurin:21-jdk-jammy
 
-WORKDIR /app
+# WORKDIR /app
 
-# Copy build files first (better caching)
-COPY mvnw pom.xml ./
-COPY .mvn/ .mvn/
+# # Copy build files first (better caching)
+# COPY mvnw pom.xml ./
+# COPY .mvn/ .mvn/
 
-# Build the app (matches your pom.xml)
-RUN ./mvnw clean package
+# # Build the app (matches your pom.xml)
+# RUN ./mvnw clean package
 
-# Copy only the built JAR
-COPY target/mansi-*.jar app.jar
+# # Copy only the built JAR
+# COPY target/mansi-*.jar app.jar
 
-# Run with production profile
-CMD ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
+# # Run with production profile
+# CMD ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
+
+FROM eclipse-temurin:21-jdk-alpine as build
+WORKDIR /workspace/app
+ 
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+ 
+RUN ./mvnw install -DskipTests
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+ 
+FROM eclipse-temurin:21-jre-alpine
+VOLUME /tmp
+ARG DEPENDENCY=/workspace/app/target/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java","-cp","app:app/lib/*","reactjavaproject.cinewave.CinewaveApplication", "--spring.profiles.active=production"]
