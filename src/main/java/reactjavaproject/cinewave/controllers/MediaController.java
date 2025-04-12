@@ -10,6 +10,7 @@ import reactjavaproject.cinewave.services.MediaService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/media")
@@ -24,10 +25,14 @@ public class MediaController {
 
     // Hero Section
     @GetMapping("/hero")
-    public ResponseEntity<List<Media>> getHeroSectionItems(
-            @RequestParam(defaultValue = "5") int limit) {
-        return ResponseEntity.ok(mediaService.getHeroSectionItems(limit));
-    }
+public ResponseEntity<List<Media>> getHeroSectionItems(
+        @RequestParam(defaultValue = "5") int limit) {
+    // Filter by release year 2021
+    return ResponseEntity.ok(mediaService.getHeroSectionItems(limit)
+        .stream()
+        .filter(media -> media.getReleaseYear() == 2021)
+        .collect(Collectors.toList()));
+}
 
     // Featured Movies
     @GetMapping("/featured/movies")

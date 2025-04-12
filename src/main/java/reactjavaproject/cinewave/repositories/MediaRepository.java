@@ -28,8 +28,8 @@ public interface MediaRepository extends MongoRepository<Media, String> {
 
 
   // HeroSection - Newest featured content
-  @Query("{ isFeatured: true }")
-  List<Media> findFeaturedContent();
+  @Query("{ isFeatured: true, releaseYear: 2021 }")
+List<Media> findFeaturedContent();
 
 
   // Get all movies

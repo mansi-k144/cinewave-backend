@@ -9,6 +9,7 @@ import reactjavaproject.cinewave.repositories.MediaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MediaServiceImpl implements MediaService {
@@ -22,13 +23,14 @@ public class MediaServiceImpl implements MediaService {
 
     /* ===== Frontend Component Implementations ===== */
 
-    @Override
-    public List<Media> getHeroSectionItems(int limit) {
-        return mediaRepository.findFeaturedContent()
-                .stream()
-                .limit(limit)
-                .toList();
-    }
+   @Override
+public List<Media> getHeroSectionItems(int limit) {
+    return mediaRepository.findFeaturedContent()
+            .stream()
+            .filter(media -> media.getReleaseYear() != null && media.getReleaseYear() == 2021)
+            .limit(limit)
+            .collect(Collectors.toList());
+}
 
     @Override
     public List<Media> getFeaturedMovies(int limit, String tag) {
