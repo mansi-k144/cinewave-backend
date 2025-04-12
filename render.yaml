@@ -1,8 +1,8 @@
 services:
   - type: web
     name: cinewave-backend
-    runtime: java
-    buildCommand: ./mvnw clean package
+    runtime: java  # ← This forces Java recognition
+    buildCommand: chmod +x mvnw && ./mvnw clean package
     startCommand: java -jar target/*.jar
     env:
       - key: SPRING_PROFILES_ACTIVE
