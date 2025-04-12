@@ -1,9 +1,13 @@
 services:
   - type: web
     name: cinewave-backend
-    runtime: java  # ← This forces Java recognition
-    buildCommand: chmod +x mvnw && ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    runtime: docker
+    dockerfilePath: Dockerfile  # Explicitly point to your Dockerfile
     env:
       - key: SPRING_PROFILES_ACTIVE
         value: production
+      - key: SPRING_DATA_MONGODB_URI
+        value: your_mongodb_uri_here  # Required for MongoDB
+      - key: JWT_SECRET
+        value: your_jwt_secret_here   # Required for JWT
+    healthCheckPath: /api/health      # Add a health check endpoint
